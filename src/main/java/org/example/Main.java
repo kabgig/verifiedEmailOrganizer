@@ -15,7 +15,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Main class for filtering scraped CSV data based on verified email addresses.
+ *
+ * This application processes two CSV files from the user's desktop:
+ * 1. 'checked.csv' - Contains verified email addresses (emails from second column)
+ * 2. 'scraped.csv' - Contains scraped data with email information
+ *
+ * The program filters the scraped data to only include records where the email
+ * address is present in the checked file, and removes specified unwanted columns
+ * (Followers, Following, Tweets, Profile picture link, Screen name, Bio).
+ *
+ * Output: 'filtered_scraped.csv' containing only verified email records with cleaned columns.
+ */
 public class Main {
+
+    /**
+     * Main entry point that orchestrates the email verification and filtering process.
+     * Reads verified emails from 'checked.csv', filters 'scraped.csv' based on those emails,
+     * removes unwanted columns, and outputs the result to 'filtered_scraped.csv'.
+     */
     public static void main(String[] args) {
         // Get the user's desktop path
         String desktopPath = System.getProperty("user.home") + "/Desktop";
@@ -45,6 +64,15 @@ public class Main {
         }
     }
 
+    /**
+     * Reads verified email addresses from the checked CSV file.
+     * Extracts emails from the second column (index 1) of the CSV file,
+     * normalizes them to lowercase, and filters out invalid entries.
+     *
+     * @param filePath Path to the checked.csv file
+     * @return Set of verified email addresses (normalized to lowercase)
+     * @throws IOException if file reading fails
+     */
     private static Set<String> readCheckedEmails(String filePath) throws IOException {
         Set<String> emails = new HashSet<>();
 
@@ -71,6 +99,17 @@ public class Main {
         return emails;
     }
 
+    /**
+     * Filters the scraped CSV file based on verified emails and removes unwanted columns.
+     * Only includes records where the email field matches an email from the checked file.
+     * Removes specified columns (Followers, Following, Tweets, etc.) from the output.
+     *
+     * @param inputFile Path to the scraped.csv file
+     * @param outputFile Path for the filtered output file
+     * @param checkedEmails Set of verified email addresses
+     * @param columnsToRemove Set of column names to exclude from output
+     * @throws IOException if file processing fails
+     */
     private static void filterScrapedFile(String inputFile, String outputFile,
                                         Set<String> checkedEmails, Set<String> columnsToRemove) throws IOException {
 
@@ -137,6 +176,14 @@ public class Main {
         }
     }
 
+    /**
+     * Finds the email column in the CSV headers by searching for common email column names.
+     * Tries variations like "email", "Email", "EMAIL", "e-mail", etc.
+     *
+     * @param headers List of CSV header names
+     * @return Name of the email column
+     * @throws RuntimeException if no email column is found
+     */
     private static String findEmailColumn(List<String> headers) {
         // Try to find email column by common names
         String[] emailColumnNames = {"email", "Email", "EMAIL", "e-mail", "E-mail", "mail", "Mail"};
